@@ -1,11 +1,13 @@
 import tkinter
+from tkinter import StringVar
+
 from com.vigs.chat.ui.ChatWindow import ChatWindow
-from com.vigs.chat.Application import Application
+from com.vigs.chat.ChatClient import ChatClient
 
 class LoginWindow:
 
-    def __init__(self, application:Application):
-        self.application = application
+    def __init__(self, chatClient: ChatClient):
+        self.chatClient = chatClient
         self.build()
 
     def build(self):
@@ -27,8 +29,8 @@ class LoginWindow:
 
         self.bindEventHandlers()
 
-        self.txtLogin.configure(text="svig")
-        self.txtPassword.config(text="vig")
+        self.txtLogin.configure(textvariable=StringVar(value="svig"))
+        self.txtPassword.configure(textvariable=StringVar(value="vig"))
 
     def bindEventHandlers(self):
         self.root.bind("<Escape>", self.exit)
@@ -42,6 +44,6 @@ class LoginWindow:
 
     def submit(self, event):
         self.root.withdraw()
-        self.application.loginUser(login=self.txtLogin.get(), password=self.txtPassword.get())
+        self.chatClient.loginUser(login=self.txtLogin.get(), password=self.txtPassword.get())
         #ChatWindow().launch()
 

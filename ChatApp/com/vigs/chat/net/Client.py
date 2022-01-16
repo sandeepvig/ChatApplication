@@ -1,16 +1,18 @@
+import select
 import socket
 import threading
 import time
 
-import com.vigs.chat.Application as Application
+from com.vigs.chat.net.EventListener import EventSource
+from com.vigs.chat.net.EventListener import EventTarget
+from com.vigs.chat.net.EventListener import EventListener
 import com.vigs.chat.message.Messages as Messages
-from com.vigs.chat.message.Lexer import MessageLexer
+
 
 class Client:
 
-    def __init__(self, application:Application):
-        self.application = application
-        self.messageLexer = MessageLexer()
+    def __init__(self, eventListener: EventListener):
+        self.eventListener = eventListener
         self.start()
 
     def start(self):
@@ -20,16 +22,18 @@ class Client:
         #hbSenderThread = threading.Thread(target=self.sendHB, name="HBSenderThread")
         #hbSenderThread.start()
 
+        messageReaderThread = threading.Thread(target=self.readIncomingMessages, name="Thread-IncomingMessageReader")
+        messageReaderThread.start()
+
     def stop(self):
         print("Closing Socket Connection")
         self.clientSocket.close()
         print("Socket Connection Closed")
 
-    def send(self, message:Messages.Message):
-        networkForm:str = self.messageLexer.write(message)
+    def send(self, message: str):
         ## VIGS_RELEARN use sendall() instead of send()
-        self.clientSocket.sendall(bytearray(networkForm, "UTF-8"))
-        print("Sent Message: ", networkForm)
+        self.clientSocket.sendall(bytearray(message, "UTF-8"))
+        print("Sent Message: ", message)
 
     def sendHB(self):
         messageSeq = 0
@@ -40,3 +44,11 @@ class Client:
             print("Sent Message:", messageToSend)
             time.sleep(1000)
 
+
+    def readIncomingMessages(self):
+        dataReadySockets = select.select([self.clientSocket], [], [])[0]
+        if len(dataReadySockets) >0:
+            dataReadySocket: socket.socket = dataReadySockets[0]
+            data = dataReadySocket.recv(99999)
+            print("Message received: ", str(data.decode()))
+            self.eventListener.onData(msgData=str(data.decode()), eventSource=EventSource("server"))

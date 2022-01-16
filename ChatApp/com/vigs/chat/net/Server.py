@@ -51,7 +51,7 @@ class Server:
 
     def send(self, msgData: str, eventTarget: EventTarget):
         targetSocket: socket.socket = self.clientSockets[eventTarget.targetId]
-        targetSocket.send(bytearray(msgData, "UTF-8"))
+        targetSocket.sendall(bytearray(msgData, "UTF-8"))
         print("Sent response:", msgData, ", to connection: ", targetSocket)
 
 

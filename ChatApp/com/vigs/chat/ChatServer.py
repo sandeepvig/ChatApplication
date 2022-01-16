@@ -68,4 +68,3 @@ class ChatServer(EventListener):
             time.sleep(1)
 
 
-ChatServer()

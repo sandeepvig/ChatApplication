@@ -1,9 +1,9 @@
 import enum
 
 class LoginStatus(enum.Enum):
-    ON = 1
-    OFF = 2
-    FAILURE = 3
+    ON = "ON"
+    OFF = "OFF"
+    FAILURE = "FAILURE"
 
 
 

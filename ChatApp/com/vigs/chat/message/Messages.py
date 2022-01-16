@@ -46,9 +46,9 @@ class LoginStatusMessage(Message):
         self.chatRooms = chatRooms
 
     def __str__(self):
-        toStr = "LoginStatusMessage[user: " + self.user \
-                + ", loginStatus: " + self.loginStatus \
-                + ", chatRooms: " + self.chatRooms \
+        toStr = "LoginStatusMessage[user: " + str(self.user) \
+                + ", loginStatus: " + str(self.loginStatus) \
+                + ", chatRooms: " + str(self.chatRooms) \
                 + "]"
         return toStr
 
