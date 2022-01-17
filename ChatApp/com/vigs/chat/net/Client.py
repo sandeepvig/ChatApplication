@@ -2,6 +2,7 @@ import select
 import socket
 import threading
 import time
+import traceback
 
 from com.vigs.chat.net.EventListener import EventSource
 from com.vigs.chat.net.EventListener import EventTarget
@@ -46,9 +47,18 @@ class Client:
 
 
     def readIncomingMessages(self):
-        dataReadySockets = select.select([self.clientSocket], [], [])[0]
-        if len(dataReadySockets) >0:
-            dataReadySocket: socket.socket = dataReadySockets[0]
-            data = dataReadySocket.recv(99999)
-            print("Message received: ", str(data.decode()))
-            self.eventListener.onData(msgData=str(data.decode()), eventSource=EventSource("server"))
+        counter = 0
+        while True:
+            try:
+                print("Counter: ", counter)
+                dataReadySockets = select.select([self.clientSocket], [], [])[0]
+                if len(dataReadySockets) > 0:
+                    dataReadySocket: socket.socket = dataReadySockets[0]
+                    data = dataReadySocket.recv(99999)
+                    print("Message received: ", str(data.decode()))
+                    self.eventListener.onData(msgData=str(data.decode()), eventSource=EventSource("server"))
+            except Exception as ex:
+                traceback.print_exception(ex)
+                print("Exception occured in readIncomingMessages:", ex)
+
+            counter += 1

@@ -25,7 +25,8 @@ class ChatServer(EventListener):
 
     def onData(self, msgData, eventSource: EventSource):
         response: Messages.Message = self.processMessage(msgData=msgData, eventSource=eventSource)
-        self.server.send(self.messageLexer.write(response), EventTarget(targetId=eventSource.getSourceId()))
+        if response is not None:
+            self.server.send(self.messageLexer.write(response), EventTarget(targetId=eventSource.getSourceId()))
 
     def processMessage(self, msgData: str, eventSource: EventSource):
         message = self.messageLexer.read(message=msgData)
@@ -34,6 +35,8 @@ class ChatServer(EventListener):
             return self.loginUser(loginMessage=message, eventSource=eventSource)
         elif type(message) == Messages.LogoffMessage:
             pass
+        elif type(message) == Messages.ChatMessage:
+            return self.deliverChatMessage(chatMessage=message)
 
 
     def loginUser(self, loginMessage: Messages.LoginMessage, eventSource: EventSource):
@@ -42,12 +45,23 @@ class ChatServer(EventListener):
             if user is not None and user.password == loginMessage.password:
                 loginSession = LoginSession(login=user.login, sessionid=eventSource.getSourceId())
                 self.loginSessions[user.login] = loginSession
+                print("LoginSession created:", loginSession)
                 return Messages.LoginStatusMessage(user=user, loginStatus=LoginStatus.ON, error=None, chatRooms=None)
             else:
                 return Messages.LoginStatusMessage(user=None, loginStatus=LoginStatus.FAILURE, error="Invalid username/password", chatRooms=None)
         except Exception as ex:
             traceback.print_exception(ex)
             return Messages.LoginStatusMessage(user=None, loginStatus=LoginStatus.FAILURE, error="Error while login, try again", chatRooms=None)
+
+    def deliverChatMessage(self, chatMessage: Messages.ChatMessage):
+        toUser = chatMessage.toUser
+        toUserLoginSession: LoginSession = self.loginSessions[toUser]
+        print("toUser:", toUser, "toUserLoginSession:", toUserLoginSession)
+
+        if LoginSession is not None:
+            eventTargetId = toUserLoginSession.sessionid
+            self.server.send(self.messageLexer.write(message=chatMessage), eventTarget=EventTarget(targetId=eventTargetId))
+            print("Delivered:", chatMessage, )
 
 
     def purgeInActiveSessions(self):

@@ -1,8 +1,14 @@
 import tkinter
+import threading
+
+from com.vigs.chat.ChatClient import ChatClient
 from com.vigs.chat.data.User import User
+from com.vigs.chat.ui.UserDisplayName import UserDisplayName
 
 class ChatWindow:
-    def __init__(self):
+    def __init__(self, chatClient: ChatClient, loginUser: str):
+        self.loginUser = loginUser
+        self.chatClient = chatClient
         self.build()
 
     def launch(self):
@@ -10,7 +16,7 @@ class ChatWindow:
 
     def build(self):
         self.root = tkinter.Tk()
-        self.root.title("Vigs-Chat")
+        self.root.title(str(self.loginUser))
         self.buildChatRoomList()
         self.buildChatRoomLabel()
         self.buildChatHistory()
@@ -38,14 +44,21 @@ class ChatWindow:
     def loadChatRooms(self):
         #self.userList.insert(User(login="atiwari", fname="Abhishek", lname="Tiwari"),"Abhishek Tiwari")
         #self.userList.insert(User(login="vvirmani", fname="Vineet", lname="Vineet"), "Vineet Virmani")
-        self.chatRoomList.insert(tkinter.END, "Abhishek Tiwari")
-        self.chatRoomList.insert(tkinter.END, "Vineet Virmani")
+        self.chatRoomList.insert(tkinter.END, UserDisplayName(login="atiwari", fname="Abhishek", lname="Tiwari"))
+        self.chatRoomList.insert(tkinter.END, UserDisplayName(login="vvirmani", fname="Vineet", lname="Virmani"))
+        self.chatRoomList.insert(tkinter.END, UserDisplayName(login="svig", fname="Sandeep", lname="Vig"))
+        self.chatRoomList.insert(tkinter.END, UserDisplayName(login="agupta", fname="Amit", lname="Gupta"))
 
     def registerEventHandlers(self):
         self.chatRoomList.bind("<<ListboxSelect>>", self.chatRoomSelectionHandler)
+        self.txtChatMessage.bind("<Return>", self.sendChatMessage)
 
     def chatRoomSelectionHandler(self, event):
         self.chatRoomLabel.config(text=self.chatRoomList.get(self.chatRoomList.curselection()[0]))
 
+    def sendChatMessage(self, event):
+        toUserDisplayName: str = self.chatRoomList.get(self.chatRoomList.curselection()[0])
+        toUser = toUserDisplayName[toUserDisplayName.rfind("(")+1:len(toUserDisplayName)-1]
+        print("toUser:", toUser)
+        self.chatClient.sendChatMessage(fromUser=self.chatClient.loggedInUser, toUser=toUser, message=self.txtChatMessage.get())
 
-###ChatWindow().launch()

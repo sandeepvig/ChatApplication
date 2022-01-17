@@ -10,7 +10,7 @@ class MessageLexer:
     def __init__(self):
         pass
 
-    def read(self, message):
+    def read(self, message: str):
         fields = message.split(sep=Constants.FIELDS_SEP)
         attributes = {}
         for field in fields:
@@ -26,7 +26,7 @@ class MessageLexer:
             case Constants.MESSAGE_TYPE_CHAT:
                 fromUser = attributes[Constants.Fields.FROM_USER]
                 toUser = attributes[Constants.Fields.TO_USER]
-                serviceForm = Messages.ChatMessage(fromUser=fromUser, toUser=toUser, sentTime=sentTime)
+                serviceForm = Messages.ChatMessage(fromUser=fromUser, toUser=toUser, messageText=attributes[Constants.Fields.MESSAGE_TEXT], sentTime=sentTime)
             case Constants.MESSAGE_TYPE_HB:
                 fromUser = attributes[Constants.Fields.FROM_USER]
                 serviceForm = Messages.HBMessage(fromUser=fromUser, sentTime=sentTime)
@@ -45,7 +45,7 @@ class MessageLexer:
 
         return serviceForm
 
-    def write(self, message):
+    def write(self, message: Messages.Message):
         sentTime = time.strftime("%Y-%m-%d %H:%M:%S")  # VIGS_RELEARN Datetime formatting
         strMessage = "MsgType=" + message.msgType() \
                      + Constants.FIELDS_SEP \
@@ -63,7 +63,7 @@ class MessageLexer:
                                 + Constants.Fields.PASSWORD + Constants.KEY_VALUE_SEP + message.password
             elif isinstance(message, Messages.ChatMessage):
                 strMessage += Constants.FIELDS_SEP \
-                              + Constants.Fields.TO_USER + message.toUser \
+                              + Constants.Fields.TO_USER + Constants.KEY_VALUE_SEP + message.toUser \
                               + Constants.FIELDS_SEP \
                               + Constants.Fields.MESSAGE_TEXT + Constants.KEY_VALUE_SEP + message.messageText
 

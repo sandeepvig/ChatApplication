@@ -3,7 +3,8 @@ from com.vigs.chat.data.User import User
 from com.vigs.chat.data.LoginStatus import LoginStatus
 
 class Message:
-    pass
+    def msgType(self):
+        pass
 
 
 class LoginMessage(Message):

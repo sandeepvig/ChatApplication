@@ -1,6 +1,4 @@
-from com.vigs.chat.ChatClient import ChatClient
+from com.vigs.chat.ChatClientImpl import ChatClientImpl
 from com.vigs.chat.ui.LoginWindow import LoginWindow
 
-chatClient = ChatClient()
-loginWindow = LoginWindow(chatClient)
-loginWindow.launch()
+chatClient = ChatClientImpl()
