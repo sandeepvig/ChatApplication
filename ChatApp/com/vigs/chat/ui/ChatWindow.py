@@ -1,5 +1,7 @@
+import time
 import tkinter
 import threading
+import traceback
 
 from com.vigs.chat.ChatClient import ChatClient
 from com.vigs.chat.data.User import User
@@ -21,9 +23,11 @@ class ChatWindow:
         self.buildChatRoomLabel()
         self.buildChatHistory()
         self.buildChatMessageInput()
+
         self.loadChatRooms()
 
         self.registerEventHandlers()
+
 
     def buildChatRoomList(self):
         self.chatRoomList = tkinter.Listbox(self.root)

@@ -16,6 +16,7 @@ class Client:
         self.eventListener = eventListener
         self.start()
 
+
     def start(self):
         self.clientSocket = socket.create_connection(address=(socket.gethostname(), 60000))
 
@@ -26,6 +27,7 @@ class Client:
         messageReaderThread = threading.Thread(target=self.readIncomingMessages, name="Thread-IncomingMessageReader")
         messageReaderThread.start()
 
+
     def stop(self):
         print("Closing Socket Connection")
         self.clientSocket.close()
@@ -35,6 +37,7 @@ class Client:
         ## VIGS_RELEARN use sendall() instead of send()
         self.clientSocket.sendall(bytearray(message, "UTF-8"))
         print("Sent Message: ", message)
+
 
     def sendHB(self):
         messageSeq = 0
@@ -51,12 +54,9 @@ class Client:
         while True:
             try:
                 print("Counter: ", counter)
-                dataReadySockets = select.select([self.clientSocket], [], [])[0]
-                if len(dataReadySockets) > 0:
-                    dataReadySocket: socket.socket = dataReadySockets[0]
-                    data = dataReadySocket.recv(99999)
-                    print("Message received: ", str(data.decode()))
-                    self.eventListener.onData(msgData=str(data.decode()), eventSource=EventSource("server"))
+                data = self.clientSocket.recv(9999)
+                print("Message received: ", str(data.decode()))
+                self.eventListener.onData(msgData=str(data.decode()), eventSource=EventSource("server"))
             except Exception as ex:
                 traceback.print_exception(ex)
                 print("Exception occured in readIncomingMessages:", ex)

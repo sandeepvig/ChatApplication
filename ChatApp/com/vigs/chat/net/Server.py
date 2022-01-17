@@ -28,7 +28,7 @@ class Server:
 
 
         'Start a thread to read incoming messages from client connections'
-        threadReadMessages = threading.Thread(target=self.readIncomingMessages, name="Thread-ReadIncomingMessages")
+        threadReadMessages = threading.Thread(target=self.readIncomingMessages_V1, name="Thread-ReadIncomingMessages")
         threadReadMessages.start()
 
         'Start a thread to accept incoming client connections'
@@ -45,10 +45,16 @@ class Server:
                 connId = str(self.connectionIdGenerator)
                 self.clientSockets[connId] = clientSocket
                 self.clientSocketsToConnIdDict[clientSocket] = connId
+
+                #self.startMessageReaderThread()
             except Exception as ex:
                 traceback.print_exception(ex)
                 print("Exiting from here")
                 exit()
+
+    def startMessageReaderThread(self, clientSocket: socket.socket):
+        t = threading.Thread(target=self.readIncomingMessages_V2, args=(clientSocket,))
+        t.start()
 
     def send(self, msgData: str, eventTarget: EventTarget):
         targetSocket: socket.socket = self.clientSockets[eventTarget.targetId]
@@ -56,7 +62,7 @@ class Server:
         print("Sent response:", msgData, ", to connection: ", targetSocket, ", targetId:", eventTarget.targetId)
 
 
-    def readIncomingMessages(self):
+    def readIncomingMessages_V1(self):
         while True:
             if len(self.clientSockets) > 0:
                 #print("Waiting to read messages")
@@ -67,12 +73,11 @@ class Server:
                 for clientSocket in dataReadySockets:
                     clientSocketRef: socket.socket = clientSocket ## just and just to specify datatype, so that class methods can be seen at coding time
                     try:
-                            data = clientSocketRef.recv(99999)
+                            data = clientSocketRef.recv(999)
                             if len(data) > 0:
                                 msgData = data.decode()
                                 print("Message received from: ", clientSocketRef.getpeername(), ", Message: ", msgData)
                                 self.eventListener.onData(msgData, EventSource(sourceId=self.clientSocketsToConnIdDict[clientSocketRef]))
-
                             else:
                                 print("NULL DATA RECEIVED FROM SOCKET, WHY????", clientSocketRef)
                     except Exception as ex:

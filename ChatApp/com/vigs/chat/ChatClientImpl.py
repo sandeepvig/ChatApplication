@@ -14,7 +14,7 @@ class ChatClientImpl(ChatClient):
         loginWindowThread.start()
 
     def onLoginSuccess(self):
-        chatWindowThread = threading.Thread(target=self.launchChatWindow(), name="Thread-LaunchChatWindow")
+        chatWindowThread = threading.Thread(target=self.launchChatWindow, name="Thread-LaunchChatWindow")
         chatWindowThread.start()
 
     def onLogoffSuccess(self):
