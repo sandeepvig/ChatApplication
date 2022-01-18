@@ -30,7 +30,7 @@ class ChatWindow:
 
 
     def buildChatRoomList(self):
-        self.chatRoomList = tkinter.Listbox(self.root)
+        self.chatRoomList = tkinter.Listbox(self.root, width=30)
         self.chatRoomList.grid(row=0, column=0, rowspan=3, sticky=tkinter.NSEW)
 
     def buildChatRoomLabel(self):
@@ -42,7 +42,8 @@ class ChatWindow:
         self.txtChatHistory.grid(row=1, column=1, sticky=tkinter.NSEW)
 
     def buildChatMessageInput(self):
-        self.txtChatMessage = tkinter.Entry(self.root)
+        self.chatMessageStringVar = tkinter.StringVar(self.root) ##VIGS_RELEARN : MUST SPECIFY master for StringVar(), else it does not work
+        self.txtChatMessage = tkinter.Entry(self.root, textvariable=self.chatMessageStringVar)
         self.txtChatMessage.grid(row=2, column=1, sticky=tkinter.NSEW)
 
     def loadChatRooms(self):
@@ -64,5 +65,9 @@ class ChatWindow:
         toUserDisplayName: str = self.chatRoomList.get(self.chatRoomList.curselection()[0])
         toUser = toUserDisplayName[toUserDisplayName.rfind("(")+1:len(toUserDisplayName)-1]
         print("toUser:", toUser)
-        self.chatClient.sendChatMessage(fromUser=self.chatClient.loggedInUser, toUser=toUser, message=self.txtChatMessage.get())
+        messageText = self.txtChatMessage.get()
+        self.txtChatHistory.insert(tkinter.END, self.chatClient.loggedInUser + ": " + messageText +"\n")
+        self.chatMessageStringVar.set("")
+        print("Value of StringVar NOW:", self.chatMessageStringVar.get())
+        self.chatClient.sendChatMessage(fromUser=self.chatClient.loggedInUser, toUser=toUser, message=messageText)
 

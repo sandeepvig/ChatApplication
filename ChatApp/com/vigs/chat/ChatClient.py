@@ -24,6 +24,9 @@ class ChatClient(EventListener, ABC):
         print("Message Received:", message)
         if isinstance(message, Messages.LoginStatusMessage):
             self.processLoginResponse(loginStatusMessage=message)
+        elif isinstance(message, Messages.ChatMessage):
+            self.processChatMessage(chatMessage=message)
+
 
 
     def loginUser(self, login:str, password:str):
@@ -40,6 +43,9 @@ class ChatClient(EventListener, ABC):
             case LoginStatus.FAILURE:
                 self.onLoginFailure(error=loginStatusMessage.error)
 
+    def processChatMessage(self, chatMessage: Messages.ChatMessage):
+        pass
+        #display it to the user
 
     def sendChatMessage(self, fromUser: str, toUser: str, message: str):
         chatMessage = Messages.ChatMessage(fromUser=fromUser, toUser=toUser, messageText=message, sentTime=time.ctime())

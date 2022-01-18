@@ -1,8 +1,11 @@
 import threading
+import tkinter
 
+import com.vigs.chat.message.Messages as Messages
 from com.vigs.chat.ChatClient import ChatClient
 from com.vigs.chat.ui.LoginWindow import LoginWindow
 from com.vigs.chat.ui.ChatWindow import ChatWindow
+
 
 class ChatClientImpl(ChatClient):
 
@@ -23,11 +26,15 @@ class ChatClientImpl(ChatClient):
     def onLoginFailure(self, error):
         pass
 
+    def processChatMessage(self, chatMessage: Messages.ChatMessage):
+        displayText = chatMessage.fromUser + ": " + chatMessage.messageText + "\n"
+        self.chatWindow.txtChatHistory.insert(tkinter.END, displayText)
+
     def launchLoginWindow(self):
         loginWindow = LoginWindow(chatClient=self)
         loginWindow.launch()
 
     def launchChatWindow(self):
-        chatWindow = ChatWindow(chatClient=self, loginUser=self.loggedInUser)
-        chatWindow.launch()
+        self.chatWindow = ChatWindow(chatClient=self, loginUser=self.loggedInUser)
+        self.chatWindow.launch()
 
