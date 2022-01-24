@@ -24,14 +24,19 @@ class Client:
         #hbSenderThread = threading.Thread(target=self.sendHB, name="HBSenderThread")
         #hbSenderThread.start()
 
-        messageReaderThread = threading.Thread(target=self.readIncomingMessages, name="Thread-IncomingMessageReader")
-        messageReaderThread.start()
+        self.isStarted = True
+        self.messageReaderThread = threading.Thread(target=self.readIncomingMessages, name="Thread-IncomingMessageReader")
+        self.messageReaderThread.start()
 
 
     def stop(self):
+        self.isStarted = False
         print("Closing Socket Connection")
+        self.clientSocket.shutdown(socket.SHUT_RDWR)
+        self.clientSocket.detach()
         self.clientSocket.close()
         print("Socket Connection Closed")
+
 
     def send(self, message: str):
         ## VIGS_RELEARN use sendall() instead of send()
@@ -51,7 +56,7 @@ class Client:
 
     def readIncomingMessages(self):
         counter = 0
-        while True:
+        while self.isStarted:
             try:
                 print("Counter: ", counter)
                 data = self.clientSocket.recv(9999)

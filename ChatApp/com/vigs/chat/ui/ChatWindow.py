@@ -1,5 +1,6 @@
 import time
 import tkinter
+import tkinter.dnd
 import threading
 import traceback
 
@@ -23,10 +24,12 @@ class ChatWindow:
         self.buildChatRoomLabel()
         self.buildChatHistory()
         self.buildChatMessageInput()
+        self.buildSendFileButton()
 
         self.loadChatRooms()
 
         self.registerEventHandlers()
+
 
 
     def buildChatRoomList(self):
@@ -35,16 +38,21 @@ class ChatWindow:
 
     def buildChatRoomLabel(self):
         self.chatRoomLabel = tkinter.Label(self.root, text="Room-XXX")
-        self.chatRoomLabel.grid(row=0, column=1, sticky=tkinter.NSEW)
+        self.chatRoomLabel.grid(row=0, column=1, columnspan=2, sticky=tkinter.NSEW)
 
     def buildChatHistory(self):
         self.txtChatHistory = tkinter.Text(self.root)
-        self.txtChatHistory.grid(row=1, column=1, sticky=tkinter.NSEW)
+        self.txtChatHistory.grid(row=1, column=1, columnspan=2, sticky=tkinter.NSEW)
 
     def buildChatMessageInput(self):
         self.chatMessageStringVar = tkinter.StringVar(self.root) ##VIGS_RELEARN : MUST SPECIFY master for StringVar(), else it does not work
-        self.txtChatMessage = tkinter.Entry(self.root, textvariable=self.chatMessageStringVar)
-        self.txtChatMessage.grid(row=2, column=1, sticky=tkinter.NSEW)
+        self.txtChatMessage = tkinter.Entry(self.root, textvariable=self.chatMessageStringVar, width=100)
+        self.txtChatMessage.grid(row=2, column=1, columnspan=1, sticky=tkinter.NSEW)
+
+    def buildSendFileButton(self):
+        self.btnSendFile = tkinter.Button(self.root, text="Send File", background="dark gray", relief="raised")
+        self.btnSendFile.grid(row=2, column=2, columnspan=1)
+
 
     def loadChatRooms(self):
         #self.userList.insert(User(login="atiwari", fname="Abhishek", lname="Tiwari"),"Abhishek Tiwari")
@@ -55,8 +63,15 @@ class ChatWindow:
         self.chatRoomList.insert(tkinter.END, UserDisplayName(login="agupta", fname="Amit", lname="Gupta"))
 
     def registerEventHandlers(self):
+        self.root.protocol("WM_DELETE_WINDOW", self.exit)
         self.chatRoomList.bind("<<ListboxSelect>>", self.chatRoomSelectionHandler)
         self.txtChatMessage.bind("<Return>", self.sendChatMessage)
+        self.btnSendFile.bind("<Button-1>", self.openFileDialog)
+
+    def exit(self):
+        self.chatClient.stop()
+        quit()
+        print("All clossing done")
 
     def chatRoomSelectionHandler(self, event):
         self.chatRoomLabel.config(text=self.chatRoomList.get(self.chatRoomList.curselection()[0]))
@@ -71,3 +86,5 @@ class ChatWindow:
         print("Value of StringVar NOW:", self.chatMessageStringVar.get())
         self.chatClient.sendChatMessage(fromUser=self.chatClient.loggedInUser, toUser=toUser, message=messageText)
 
+    def openFileDialog(self, event: tkinter.Event):
+        print("Send File Clicked")

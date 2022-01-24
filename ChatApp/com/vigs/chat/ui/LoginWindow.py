@@ -36,11 +36,14 @@ class LoginWindow:
     def bindEventHandlers(self):
         self.root.bind("<Escape>", self.exit)
         self.root.bind("<Return>", self.submit)
+        self.btnLogin.bind("<Button-1>", self.submit)
+        self.btnCancel.bind("<Button-1>", self.exit)
 
     def launch(self):
         self.root.mainloop()
 
     def exit(self, event):
+        self.chatClient.stop()
         quit()
 
     def submit(self, event):

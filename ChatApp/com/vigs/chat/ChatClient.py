@@ -17,6 +17,8 @@ class ChatClient(EventListener, ABC):
         self.messageLexer = MessageLexer()
         self.clientSocket = Client(self)
 
+    def stop(self):
+        self.clientSocket.stop()
 
     def onData(self, msgData, eventSource: EventSource):
         # do nothing, child classes to provide implementation
